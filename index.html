@@ -23,6 +23,7 @@
       --p-color-bg-info: #e0f0ff;
       --p-color-bg-magic: #e4e5ff;
       --p-color-btn-primary: #303030;
+      --p-color-btn-secondary: #005bd3;
       --p-radius: 8px;
       --p-radius-sm: 4px;
       --p-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -54,7 +55,7 @@
     }
 
     .prototype-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .prototype-controls label { font-weight: 600; color: var(--p-color-text-secondary); }
+    .prototype-controls label { font-weight: 600; color: var(--p-color-text-secondary); font-size: 12px; }
 
     select {
       font-family: inherit;
@@ -88,10 +89,22 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.02em;
+      white-space: nowrap;
     }
     .badge-pill.warning { background: var(--p-color-bg-warning); color: #7f4a00; }
     .badge-pill.success { background: var(--p-color-bg-success); color: var(--p-color-text-success); }
     .badge-pill.info { background: var(--p-color-bg-info); color: var(--p-color-text-info); }
+
+    .layout-label {
+      display: inline-block;
+      background: var(--p-color-bg-info);
+      color: var(--p-color-text-info);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
 
     .map-placeholder {
       background: linear-gradient(135deg, #e8f4fc 0%, #d4e8f7 50%, #c5dff0 100%);
@@ -126,8 +139,12 @@
     }
 
     .except-card { border: 2px solid #b4d8ff; background: #fafcff; }
-    .except-card.locked { opacity: 0.55; pointer-events: none; }
+    .except-card.locked { opacity: 0.55; }
+    .except-card.locked .except-controls-inner { pointer-events: none; }
     .except-card.active { border-color: #108043; background: #f8fff9; }
+
+    .unified-card { border: 1px solid var(--p-color-border); }
+    .unified-card.active { border-color: #108043; background: #f8fff9; }
 
     .card-header-row {
       display: flex;
@@ -227,7 +244,13 @@
     .actions-row {
       display: flex;
       justify-content: flex-end;
+      gap: 8px;
       margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .actions-row.dual {
+      justify-content: flex-end;
     }
 
     .btn {
@@ -241,11 +264,14 @@
       cursor: pointer;
       border: 1px solid transparent;
       font-family: inherit;
+      white-space: nowrap;
     }
     .btn-primary { background: var(--p-color-btn-primary); color: white; }
     .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-secondary-action { background: var(--p-color-btn-secondary); color: white; }
+    .btn-secondary-action:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn-secondary { background: white; border-color: var(--p-color-border); color: var(--p-color-text); }
-    .btn-plain { background: transparent; color: var(--p-color-text-info); padding: 4px 8px; }
+    .btn-plain { background: transparent; color: var(--p-color-text-info); padding: 4px 8px; border: none; cursor: pointer; font-family: inherit; font-size: 13px; }
 
     .success-banner {
       background: var(--p-color-bg-success);
@@ -255,7 +281,7 @@
       margin-bottom: 16px;
     }
     .success-banner strong { color: var(--p-color-text-success); }
-    .success-banner .actions { margin-top: 8px; display: flex; gap: 12px; }
+    .success-banner .actions { margin-top: 8px; display: flex; gap: 12px; flex-wrap: wrap; }
 
     .upgrade-box {
       background: #f7f7f7;
@@ -265,6 +291,7 @@
       flex-wrap: wrap;
       align-items: center;
       gap: 12px;
+      margin-top: 12px;
     }
 
     .table-wrap { overflow-x: auto; }
@@ -304,8 +331,53 @@
       border-bottom: 1px solid var(--p-color-border);
       font-size: 12px;
       color: var(--p-color-text-subdued);
+      flex-wrap: wrap;
     }
     .nav-stub .active { color: var(--p-color-text); font-weight: 600; }
+
+    .review-card {
+      background: #fffbe6;
+      border: 1px solid #ffe58f;
+      border-radius: var(--p-radius);
+      padding: 20px;
+      margin-top: 24px;
+    }
+    .review-card h2 { font-size: 16px; margin-bottom: 12px; }
+    .review-list { list-style: none; }
+    .review-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #ffe58f;
+      font-size: 13px;
+    }
+    .review-list li:last-child { border-bottom: none; }
+    .review-list input[type="checkbox"] { margin-top: 2px; width: 16px; height: 16px; cursor: pointer; }
+
+    .hidden { display: none !important; }
+
+    .plan-badge {
+      font-size: 11px;
+      color: var(--p-color-text-subdued);
+      margin-left: 4px;
+    }
+
+    .tooltip-wrap { position: relative; display: inline-block; }
+    .tooltip-text {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 6px);
+      right: 0;
+      background: #303030;
+      color: white;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 20;
+    }
+    .tooltip-wrap:hover .tooltip-text { display: block; }
   </style>
 </head>
 <body>
@@ -314,13 +386,20 @@
       <div>
         <strong>Prototype — Block All Countries Except</strong>
         <div style="font-size:12px;color:var(--p-color-text-secondary);margin-top:2px;">
-          Toggle plan and except-mode states. Not connected to a backend.
+          Toggle layout, plan, and presets. Not connected to a backend.
         </div>
       </div>
       <div class="prototype-controls">
+        <label for="layoutSelect">Layout:</label>
+        <select id="layoutSelect">
+          <option value="a">Option A — Separate card</option>
+          <option value="b">Option B — Unified picker</option>
+        </select>
         <label for="planSelect">Plan:</label>
         <select id="planSelect">
-          <option value="pro">Pro (paid)</option>
+          <option value="pro">Pro</option>
+          <option value="advanced">Advanced</option>
+          <option value="growth">Growth</option>
           <option value="free">Free</option>
         </select>
         <label for="presetSelect">Preset:</label>
@@ -358,42 +437,86 @@
       </div>
     </div>
 
-    <!-- Block Except Card -->
-    <div class="card except-card" id="exceptCard">
-      <div class="card-header-row">
-        <div>
-          <h2>Block All Countries Except</h2>
-          <p class="subtext">Allow visitors only from selected countries. All others will be blocked.</p>
+    <!-- ===== LAYOUT A: Separate card ===== -->
+    <div id="layoutA">
+      <span class="layout-label">Option A — Separate card</span>
+      <div class="card except-card" id="exceptCardA">
+        <div class="card-header-row">
+          <div>
+            <h2>Block All Countries Except</h2>
+            <p class="subtext">Allow visitors only from selected countries. All others will be blocked.</p>
+          </div>
+          <span class="badge-pill warning" id="proBadgeA">PRO+ FEATURE</span>
         </div>
-        <span class="badge-pill warning" id="proBadge">PRO FEATURE</span>
-      </div>
 
-      <div id="activeBanner" class="success-banner" style="display:none;">
-        <strong>Blocking all countries except:</strong>
-        <div class="summary-chips" id="activeBannerChips"></div>
-        <p style="margin-top:8px;font-size:12px;">Visitors from all other countries will be blocked.</p>
-        <div class="actions">
-          <button type="button" class="btn-plain" id="editBtn">Edit allowlist</button>
-          <button type="button" class="btn-plain" id="switchBtn">Switch to blocklist mode</button>
+        <div id="activeBannerA" class="success-banner hidden">
+          <strong>Blocking all countries except:</strong>
+          <div class="summary-chips" id="activeBannerChipsA"></div>
+          <p style="margin-top:8px;font-size:12px;">Visitors from all other countries will be blocked.</p>
+          <div class="actions">
+            <button type="button" class="btn-plain" id="editBtnA">Edit allowlist</button>
+            <button type="button" class="btn-plain" id="switchBtnA">Switch to blocklist mode</button>
+          </div>
+        </div>
+
+        <div id="exceptControlsA" class="except-controls-inner">
+          <label class="field-label" for="countrySearchA">Select countries to allow</label>
+          <div class="chip-input-wrap" id="chipInputWrapA">
+            <div id="chipsContainerA"></div>
+            <input type="text" class="chip-input" id="countrySearchA" placeholder="Search countries…" autocomplete="off" />
+            <div class="dropdown" id="dropdownA"></div>
+          </div>
+          <div class="actions-row">
+            <button type="button" class="btn btn-primary" id="blockExceptBtnA" disabled>Block except</button>
+          </div>
+        </div>
+
+        <div id="upgradePromptA" class="upgrade-box hidden">
+          <span class="badge-pill warning">PRO+ FEATURE</span>
+          <span id="upgradeTextA">Block all countries except is available on Pro, Advanced, and Growth plans.</span>
+          <button type="button" class="btn btn-secondary">Upgrade to Pro</button>
         </div>
       </div>
+    </div>
 
-      <div id="exceptControls">
-        <label class="field-label" for="countrySearch">Select countries to allow</label>
-        <div class="chip-input-wrap" id="chipInputWrap">
-          <div id="chipsContainer"></div>
-          <input type="text" class="chip-input" id="countrySearch" placeholder="Search countries…" autocomplete="off" />
-          <div class="dropdown" id="dropdown"></div>
-        </div>
-        <div class="actions-row">
-          <button type="button" class="btn btn-primary" id="blockExceptBtn" disabled>Block except</button>
-        </div>
-      </div>
+    <!-- ===== LAYOUT B: Unified picker ===== -->
+    <div id="layoutB" class="hidden">
+      <span class="layout-label">Option B — Unified picker</span>
+      <div class="card unified-card" id="unifiedCard">
+        <h2>Select Countries To Restrict</h2>
+        <p class="subtext">Search and add countries, then choose how to apply the restriction.</p>
 
-      <div id="upgradePrompt" class="upgrade-box" style="display:none;">
-        <span class="badge-pill warning">PRO FEATURE</span>
-        <span>Block all countries except is available for PRO users only.</span>
-        <button type="button" class="btn btn-secondary">Upgrade to Pro</button>
+        <div id="activeBannerB" class="success-banner hidden">
+          <strong>Blocking all countries except:</strong>
+          <div class="summary-chips" id="activeBannerChipsB"></div>
+          <p style="margin-top:8px;font-size:12px;">Visitors from all other countries will be blocked.</p>
+          <div class="actions">
+            <button type="button" class="btn-plain" id="editBtnB">Edit allowlist</button>
+            <button type="button" class="btn-plain" id="switchBtnB">Switch to blocklist mode</button>
+          </div>
+        </div>
+
+        <div id="unifiedControls" class="except-controls-inner">
+          <label class="field-label" for="countrySearchB">Select countries</label>
+          <div class="chip-input-wrap" id="chipInputWrapB">
+            <div id="chipsContainerB"></div>
+            <input type="text" class="chip-input" id="countrySearchB" placeholder="Search countries…" autocomplete="off" />
+            <div class="dropdown" id="dropdownB"></div>
+          </div>
+          <div class="actions-row dual">
+            <button type="button" class="btn btn-primary" id="restrictSelectedBtn" disabled>Restrict selected countries</button>
+            <span class="tooltip-wrap" id="exceptBtnWrap">
+              <button type="button" class="btn btn-secondary-action" id="restrictExceptBtn" disabled>Restrict all except selected</button>
+              <span class="tooltip-text" id="exceptTooltip">Available on Pro, Advanced, and Growth plans</span>
+            </span>
+          </div>
+        </div>
+
+        <div id="upgradePromptB" class="upgrade-box hidden">
+          <span class="badge-pill warning">PRO+ FEATURE</span>
+          <span>Restrict all except selected is available on Pro, Advanced, and Growth plans.</span>
+          <button type="button" class="btn btn-secondary">Upgrade to Pro</button>
+        </div>
       </div>
     </div>
 
@@ -406,17 +529,31 @@
             <thead>
               <tr><th>Country</th><th>Code</th><th>Actions</th></tr>
             </thead>
-            <tbody>
+            <tbody id="blocklistBody">
               <tr><td>🇷🇺 Russian Federation</td><td>RU</td><td><button class="btn-plain" style="color:var(--p-color-text-critical)">Remove</button></td></tr>
               <tr><td>🇨🇳 China</td><td>CN</td><td><button class="btn-plain" style="color:var(--p-color-text-critical)">Remove</button></td></tr>
             </tbody>
           </table>
         </div>
       </div>
-      <div id="exceptSummary" style="display:none;">
+      <div id="exceptSummary" class="hidden">
         <p class="subtext">You are in <strong>block-except mode</strong>. All countries are blocked except those listed above.</p>
         <div class="summary-chips" id="summaryChips"></div>
       </div>
+    </div>
+
+    <!-- Marketing review checklist -->
+    <div class="review-card">
+      <h2>Marketing Review Checklist</h2>
+      <p class="subtext" style="margin-bottom:12px;">Use the controls above to test both layouts and plan states, then check off your feedback.</p>
+      <ul class="review-list">
+        <li><input type="checkbox" id="r1" /><label for="r1">Which layout do you prefer? (Option A separate card vs Option B unified picker)</label></li>
+        <li><input type="checkbox" id="r2" /><label for="r2">Is the confirmation modal copy clear and non-alarming?</label></li>
+        <li><input type="checkbox" id="r3" /><label for="r3">Is the upgrade CTA compelling for Free users?</label></li>
+        <li><input type="checkbox" id="r4" /><label for="r4">Are button labels clear enough to avoid clicking the wrong action? (Option B)</label></li>
+        <li><input type="checkbox" id="r5" /><label for="r5">Any messaging changes needed for App Store listing or help docs?</label></li>
+        <li><input type="checkbox" id="r6" /><label for="r6">Does the active-state summary banner communicate the policy clearly?</label></li>
+      </ul>
     </div>
   </div>
 
@@ -459,35 +596,62 @@
       { code: "NZ", name: "New Zealand", flag: "🇳🇿" },
     ].sort((a, b) => a.name.localeCompare(b.name));
 
+    const BLOCKLIST_COUNT = 2;
+
     let selected = [];
     let exceptModeActive = false;
     let plan = "pro";
+    let layout = "a";
 
     const els = {
+      layoutSelect: document.getElementById("layoutSelect"),
       planSelect: document.getElementById("planSelect"),
       presetSelect: document.getElementById("presetSelect"),
-      exceptCard: document.getElementById("exceptCard"),
-      exceptControls: document.getElementById("exceptControls"),
-      upgradePrompt: document.getElementById("upgradePrompt"),
-      chipsContainer: document.getElementById("chipsContainer"),
-      countrySearch: document.getElementById("countrySearch"),
-      dropdown: document.getElementById("dropdown"),
-      blockExceptBtn: document.getElementById("blockExceptBtn"),
+      layoutA: document.getElementById("layoutA"),
+      layoutB: document.getElementById("layoutB"),
+      exceptCardA: document.getElementById("exceptCardA"),
+      unifiedCard: document.getElementById("unifiedCard"),
+      exceptControlsA: document.getElementById("exceptControlsA"),
+      upgradePromptA: document.getElementById("upgradePromptA"),
+      upgradePromptB: document.getElementById("upgradePromptB"),
+      chipsContainerA: document.getElementById("chipsContainerA"),
+      chipsContainerB: document.getElementById("chipsContainerB"),
+      countrySearchA: document.getElementById("countrySearchA"),
+      countrySearchB: document.getElementById("countrySearchB"),
+      dropdownA: document.getElementById("dropdownA"),
+      dropdownB: document.getElementById("dropdownB"),
+      blockExceptBtnA: document.getElementById("blockExceptBtnA"),
+      restrictSelectedBtn: document.getElementById("restrictSelectedBtn"),
+      restrictExceptBtn: document.getElementById("restrictExceptBtn"),
+      exceptTooltip: document.getElementById("exceptTooltip"),
       confirmModal: document.getElementById("confirmModal"),
       modalBody: document.getElementById("modalBody"),
       modalCancel: document.getElementById("modalCancel"),
       modalConfirm: document.getElementById("modalConfirm"),
-      activeBanner: document.getElementById("activeBanner"),
-      activeBannerChips: document.getElementById("activeBannerChips"),
+      activeBannerA: document.getElementById("activeBannerA"),
+      activeBannerB: document.getElementById("activeBannerB"),
+      activeBannerChipsA: document.getElementById("activeBannerChipsA"),
+      activeBannerChipsB: document.getElementById("activeBannerChipsB"),
       blocklistTable: document.getElementById("blocklistTable"),
       exceptSummary: document.getElementById("exceptSummary"),
       summaryChips: document.getElementById("summaryChips"),
       restrictionsTitle: document.getElementById("restrictionsTitle"),
       mapLabel: document.getElementById("mapLabel"),
       mapLegend: document.getElementById("mapLegend"),
-      editBtn: document.getElementById("editBtn"),
-      switchBtn: document.getElementById("switchBtn"),
+      editBtnA: document.getElementById("editBtnA"),
+      switchBtnA: document.getElementById("switchBtnA"),
+      editBtnB: document.getElementById("editBtnB"),
+      switchBtnB: document.getElementById("switchBtnB"),
+      unifiedControls: document.getElementById("unifiedControls"),
     };
+
+    function isFree() { return plan === "free"; }
+    function isPaid() { return !isFree(); }
+
+    function planLabel() {
+      const labels = { pro: "Pro", advanced: "Advanced", growth: "Growth", free: "Free" };
+      return labels[plan] || plan;
+    }
 
     function renderChips(container) {
       container.innerHTML = selected.map((c) => `
@@ -504,24 +668,45 @@
     }
 
     function updateUI() {
-      const isFree = plan === "free";
-      els.exceptCard.classList.toggle("locked", isFree);
-      els.exceptControls.style.display = isFree ? "none" : (exceptModeActive ? "none" : "block");
-      els.upgradePrompt.style.display = isFree ? "flex" : "none";
-      els.activeBanner.style.display = exceptModeActive && !isFree ? "block" : "none";
-      els.blocklistTable.style.display = exceptModeActive ? "none" : "block";
-      els.exceptSummary.style.display = exceptModeActive ? "block" : "none";
-      els.exceptCard.classList.toggle("active", exceptModeActive);
-
-      renderChips(els.chipsContainer);
+      const free = isFree();
+      const hasSelection = selected.length > 0;
       const chipsHtml = selected.map(chipHtml).join("");
-      els.activeBannerChips.innerHTML = chipsHtml;
+
+      // Layout visibility
+      els.layoutA.classList.toggle("hidden", layout !== "a");
+      els.layoutB.classList.toggle("hidden", layout !== "b");
+
+      // Layout A
+      els.exceptCardA.classList.toggle("locked", free);
+      els.exceptCardA.classList.toggle("active", exceptModeActive && isPaid());
+      els.exceptControlsA.classList.toggle("hidden", free || exceptModeActive);
+      els.upgradePromptA.classList.toggle("hidden", !free);
+      els.activeBannerA.classList.toggle("hidden", !exceptModeActive || free);
+
+      renderChips(els.chipsContainerA);
+      els.activeBannerChipsA.innerHTML = chipsHtml;
+      els.blockExceptBtnA.disabled = !hasSelection || free;
+
+      // Layout B
+      els.unifiedCard.classList.toggle("active", exceptModeActive && isPaid());
+      els.unifiedControls.classList.toggle("hidden", exceptModeActive);
+      els.upgradePromptB.classList.toggle("hidden", !free);
+      els.activeBannerB.classList.toggle("hidden", !exceptModeActive || free);
+
+      renderChips(els.chipsContainerB);
+      els.activeBannerChipsB.innerHTML = chipsHtml;
+      els.restrictSelectedBtn.disabled = !hasSelection || exceptModeActive;
+      els.restrictExceptBtn.disabled = !hasSelection || free || exceptModeActive;
+      els.exceptTooltip.style.display = free ? "block" : "none";
+
+      // Shared
+      els.blocklistTable.classList.toggle("hidden", exceptModeActive);
+      els.exceptSummary.classList.toggle("hidden", !exceptModeActive);
       els.summaryChips.innerHTML = chipsHtml;
 
-      els.blockExceptBtn.disabled = selected.length === 0 || isFree;
       els.restrictionsTitle.textContent = exceptModeActive
         ? "Blocking Policy (except mode)"
-        : "Current Restrictions (2)";
+        : `Current Restrictions (${BLOCKLIST_COUNT})`;
 
       if (exceptModeActive) {
         els.mapLabel.textContent = "Except mode — green = allowed, red = all others blocked";
@@ -543,56 +728,69 @@
       ).slice(0, 8);
     }
 
-    function showDropdown(items) {
+    function showDropdown(dropdown, items) {
       if (items.length === 0) {
-        els.dropdown.classList.remove("open");
+        dropdown.classList.remove("open");
         return;
       }
-      els.dropdown.innerHTML = items.map((c) => `
+      dropdown.innerHTML = items.map((c) => `
         <button type="button" class="dropdown-item" data-code="${c.code}">
           <span>${c.flag}</span><span>${c.name}</span>
         </button>
       `).join("");
-      els.dropdown.classList.add("open");
+      dropdown.classList.add("open");
     }
 
-    els.countrySearch.addEventListener("input", () => {
-      showDropdown(filterCountries(els.countrySearch.value));
-    });
+    function setupChipInput(wrapId, searchId, dropdownId, chipsId) {
+      const wrap = document.getElementById(wrapId);
+      const search = document.getElementById(searchId);
+      const dropdown = document.getElementById(dropdownId);
+      const chips = document.getElementById(chipsId);
 
-    els.countrySearch.addEventListener("focus", () => {
-      showDropdown(filterCountries(els.countrySearch.value));
-    });
+      search.addEventListener("input", () => showDropdown(dropdown, filterCountries(search.value)));
+      search.addEventListener("focus", () => showDropdown(dropdown, filterCountries(search.value)));
 
-    document.addEventListener("click", (e) => {
-      if (!document.getElementById("chipInputWrap").contains(e.target)) {
-        els.dropdown.classList.remove("open");
-      }
-    });
+      document.addEventListener("click", (e) => {
+        if (!wrap.contains(e.target)) dropdown.classList.remove("open");
+      });
 
-    els.dropdown.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-code]");
-      if (!btn) return;
-      const c = COUNTRIES.find((x) => x.code === btn.dataset.code);
-      if (c) {
-        selected.push(c);
-        els.countrySearch.value = "";
-        els.dropdown.classList.remove("open");
+      dropdown.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-code]");
+        if (!btn) return;
+        const c = COUNTRIES.find((x) => x.code === btn.dataset.code);
+        if (c) {
+          selected.push(c);
+          search.value = "";
+          dropdown.classList.remove("open");
+          updateUI();
+        }
+      });
+
+      chips.addEventListener("click", (e) => {
+        const code = e.target.dataset.remove;
+        if (!code) return;
+        selected = selected.filter((c) => c.code !== code);
         updateUI();
-      }
-    });
+      });
+    }
 
-    els.chipsContainer.addEventListener("click", (e) => {
-      const code = e.target.dataset.remove;
-      if (!code) return;
-      selected = selected.filter((c) => c.code !== code);
-      updateUI();
-    });
-
-    els.blockExceptBtn.addEventListener("click", () => {
+    function openConfirmModal() {
       const names = selected.map((c) => c.name).join(", ");
-      els.modalBody.textContent = `This will block visitors from every country except ${names}. This replaces your current 2 blocked countries.`;
+      els.modalBody.textContent = `This will block visitors from every country except ${names}. This replaces your current ${BLOCKLIST_COUNT} blocked countries.`;
       els.confirmModal.classList.add("open");
+    }
+
+    setupChipInput("chipInputWrapA", "countrySearchA", "dropdownA", "chipsContainerA");
+    setupChipInput("chipInputWrapB", "countrySearchB", "dropdownB", "chipsContainerB");
+
+    els.blockExceptBtnA.addEventListener("click", openConfirmModal);
+    els.restrictExceptBtn.addEventListener("click", openConfirmModal);
+
+    els.restrictSelectedBtn.addEventListener("click", () => {
+      const names = selected.map((c) => c.name).join(", ");
+      alert(`[Prototype] Added to blocklist: ${names}`);
+      selected = [];
+      updateUI();
     });
 
     els.modalCancel.addEventListener("click", () => els.confirmModal.classList.remove("open"));
@@ -602,21 +800,31 @@
       updateUI();
     });
 
-    els.editBtn.addEventListener("click", () => {
+    function handleEdit() {
       exceptModeActive = false;
       updateUI();
-      els.countrySearch.focus();
-    });
+      (layout === "a" ? els.countrySearchA : els.countrySearchB).focus();
+    }
 
-    els.switchBtn.addEventListener("click", () => {
+    function handleSwitch() {
       exceptModeActive = false;
       selected = [];
+      updateUI();
+    }
+
+    els.editBtnA.addEventListener("click", handleEdit);
+    els.switchBtnA.addEventListener("click", handleSwitch);
+    els.editBtnB.addEventListener("click", handleEdit);
+    els.switchBtnB.addEventListener("click", handleSwitch);
+
+    els.layoutSelect.addEventListener("change", () => {
+      layout = els.layoutSelect.value;
       updateUI();
     });
 
     els.planSelect.addEventListener("change", () => {
       plan = els.planSelect.value;
-      if (plan === "free") exceptModeActive = false;
+      if (isFree()) exceptModeActive = false;
       updateUI();
     });
 
@@ -625,8 +833,7 @@
       exceptModeActive = v === "active";
       if (v === "empty") selected = [];
       else if (v === "us") selected = [COUNTRIES.find((c) => c.code === "US")];
-      else if (v === "us-ca") selected = ["US", "CA"].map((code) => COUNTRIES.find((c) => c.code === code));
-      else if (v === "active") selected = ["US", "CA"].map((code) => COUNTRIES.find((c) => c.code === code));
+      else if (v === "us-ca" || v === "active") selected = ["US", "CA"].map((code) => COUNTRIES.find((c) => c.code === code));
       updateUI();
     });
 
