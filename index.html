@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Securify — Block All Countries Except Mockup</title>
+  <style>
+    :root {
+      --p-color-bg: #f1f1f1;
+      --p-color-bg-surface: #ffffff;
+      --p-color-bg-surface-secondary: #f7f7f7;
+      --p-color-border: #e3e3e3;
+      --p-color-text: #303030;
+      --p-color-text-secondary: #616161;
+      --p-color-text-subdued: #8a8a8a;
+      --p-color-text-success: #108043;
+      --p-color-text-critical: #d82c0d;
+      --p-color-text-info: #005bd3;
+      --p-color-text-warning: #b98900;
+      --p-color-bg-success: #cdfee1;
+      --p-color-bg-critical: #fed3d1;
+      --p-color-bg-warning: #ffeb78;
+      --p-color-bg-info: #e0f0ff;
+      --p-color-bg-magic: #e4e5ff;
+      --p-color-btn-primary: #303030;
+      --p-radius: 8px;
+      --p-radius-sm: 4px;
+      --p-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--p-font-family);
+      background: var(--p-color-bg);
+      color: var(--p-color-text);
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .page { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+
+    .prototype-banner {
+      background: var(--p-color-bg-magic);
+      border: 1px solid #c4c6ff;
+      border-radius: var(--p-radius);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .prototype-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .prototype-controls label { font-weight: 600; color: var(--p-color-text-secondary); }
+
+    select {
+      font-family: inherit;
+      font-size: 13px;
+      padding: 6px 10px;
+      border: 1px solid var(--p-color-border);
+      border-radius: var(--p-radius-sm);
+      background: white;
+    }
+
+    .page-header h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .subtitle { color: var(--p-color-text-secondary); margin-bottom: 20px; }
+
+    .card {
+      background: var(--p-color-bg-surface);
+      border: 1px solid var(--p-color-border);
+      border-radius: var(--p-radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h2 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .card .subtext { color: var(--p-color-text-secondary); margin-bottom: 16px; font-size: 13px; }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .badge-pill.warning { background: var(--p-color-bg-warning); color: #7f4a00; }
+    .badge-pill.success { background: var(--p-color-bg-success); color: var(--p-color-text-success); }
+    .badge-pill.info { background: var(--p-color-bg-info); color: var(--p-color-text-info); }
+
+    .map-placeholder {
+      background: linear-gradient(135deg, #e8f4fc 0%, #d4e8f7 50%, #c5dff0 100%);
+      border-radius: var(--p-radius-sm);
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-legend {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      background: rgba(255,255,255,0.9);
+      padding: 6px 10px;
+      border-radius: var(--p-radius-sm);
+    }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .legend-dot.red { background: #e51c00; }
+    .legend-dot.green { background: #108043; }
+
+    .map-label {
+      text-align: center;
+      color: var(--p-color-text-secondary);
+      font-size: 12px;
+    }
+
+    .except-card { border: 2px solid #b4d8ff; background: #fafcff; }
+    .except-card.locked { opacity: 0.55; pointer-events: none; }
+    .except-card.active { border-color: #108043; background: #f8fff9; }
+
+    .card-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .chip-input-wrap {
+      border: 1px solid var(--p-color-border);
+      border-radius: var(--p-radius-sm);
+      background: white;
+      padding: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      min-height: 44px;
+      position: relative;
+    }
+
+    .chip-input-wrap:focus-within {
+      border-color: #005bd3;
+      box-shadow: 0 0 0 1px #005bd3;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--p-color-bg-surface-secondary);
+      border: 1px solid var(--p-color-border);
+      border-radius: var(--p-radius-sm);
+      padding: 2px 8px;
+      font-size: 12px;
+    }
+
+    .chip button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--p-color-text-subdued);
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 2px;
+    }
+    .chip button:hover { color: var(--p-color-text-critical); }
+
+    .chip-input {
+      border: none;
+      outline: none;
+      flex: 1;
+      min-width: 120px;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 4px;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid var(--p-color-border);
+      border-radius: var(--p-radius-sm);
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .dropdown.open { display: block; }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      font-size: 13px;
+    }
+    .dropdown-item:hover { background: var(--p-color-bg-surface-secondary); }
+
+    .actions-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
+      border-radius: var(--p-radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      font-family: inherit;
+    }
+    .btn-primary { background: var(--p-color-btn-primary); color: white; }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-secondary { background: white; border-color: var(--p-color-border); color: var(--p-color-text); }
+    .btn-plain { background: transparent; color: var(--p-color-text-info); padding: 4px 8px; }
+
+    .success-banner {
+      background: var(--p-color-bg-success);
+      border: 1px solid #95eab8;
+      border-radius: var(--p-radius-sm);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+    .success-banner strong { color: var(--p-color-text-success); }
+    .success-banner .actions { margin-top: 8px; display: flex; gap: 12px; }
+
+    .upgrade-box {
+      background: #f7f7f7;
+      border-radius: var(--p-radius-sm);
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--p-color-border); }
+    th { font-weight: 600; color: var(--p-color-text-secondary); background: var(--p-color-bg-surface-secondary); }
+    .summary-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: var(--p-radius);
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--p-color-border); font-weight: 600; font-size: 15px; }
+    .modal-body { padding: 16px 20px; color: var(--p-color-text-secondary); }
+    .modal-footer { padding: 12px 20px; border-top: 1px solid var(--p-color-border); display: flex; justify-content: flex-end; gap: 8px; }
+
+    .nav-stub {
+      display: flex;
+      gap: 16px;
+      padding: 12px 0;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--p-color-border);
+      font-size: 12px;
+      color: var(--p-color-text-subdued);
+    }
+    .nav-stub .active { color: var(--p-color-text); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="prototype-banner">
+      <div>
+        <strong>Prototype — Block All Countries Except</strong>
+        <div style="font-size:12px;color:var(--p-color-text-secondary);margin-top:2px;">
+          Toggle plan and except-mode states. Not connected to a backend.
+        </div>
+      </div>
+      <div class="prototype-controls">
+        <label for="planSelect">Plan:</label>
+        <select id="planSelect">
+          <option value="pro">Pro (paid)</option>
+          <option value="free">Free</option>
+        </select>
+        <label for="presetSelect">Preset:</label>
+        <select id="presetSelect">
+          <option value="empty">Empty selection</option>
+          <option value="us">US only</option>
+          <option value="us-ca">US + Canada</option>
+          <option value="active">Active except mode</option>
+        </select>
+      </div>
+    </div>
+
+    <nav class="nav-stub">
+      <span>Dashboard</span>
+      <span class="active">Block Countries</span>
+      <span>Block IPs</span>
+      <span>Settings</span>
+      <span>Visitor Logs</span>
+    </nav>
+
+    <header class="page-header">
+      <h1>Block Countries</h1>
+      <p class="subtitle">Restrict visitors from specific countries or allow only selected regions.</p>
+    </header>
+
+    <!-- Map -->
+    <div class="card">
+      <h2>Interactive Country Map</h2>
+      <p class="subtext">Click on countries to add or remove restrictions. Colors update based on blocking mode.</p>
+      <div class="map-placeholder" id="mapPlaceholder">
+        <div class="map-label" id="mapLabel">Blocklist mode — red countries are blocked</div>
+        <div class="map-legend" id="mapLegend">
+          <span><span class="legend-dot red"></span> Blocked</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block Except Card -->
+    <div class="card except-card" id="exceptCard">
+      <div class="card-header-row">
+        <div>
+          <h2>Block All Countries Except</h2>
+          <p class="subtext">Allow visitors only from selected countries. All others will be blocked.</p>
+        </div>
+        <span class="badge-pill warning" id="proBadge">PRO FEATURE</span>
+      </div>
+
+      <div id="activeBanner" class="success-banner" style="display:none;">
+        <strong>Blocking all countries except:</strong>
+        <div class="summary-chips" id="activeBannerChips"></div>
+        <p style="margin-top:8px;font-size:12px;">Visitors from all other countries will be blocked.</p>
+        <div class="actions">
+          <button type="button" class="btn-plain" id="editBtn">Edit allowlist</button>
+          <button type="button" class="btn-plain" id="switchBtn">Switch to blocklist mode</button>
+        </div>
+      </div>
+
+      <div id="exceptControls">
+        <label class="field-label" for="countrySearch">Select countries to allow</label>
+        <div class="chip-input-wrap" id="chipInputWrap">
+          <div id="chipsContainer"></div>
+          <input type="text" class="chip-input" id="countrySearch" placeholder="Search countries…" autocomplete="off" />
+          <div class="dropdown" id="dropdown"></div>
+        </div>
+        <div class="actions-row">
+          <button type="button" class="btn btn-primary" id="blockExceptBtn" disabled>Block except</button>
+        </div>
+      </div>
+
+      <div id="upgradePrompt" class="upgrade-box" style="display:none;">
+        <span class="badge-pill warning">PRO FEATURE</span>
+        <span>Block all countries except is available for PRO users only.</span>
+        <button type="button" class="btn btn-secondary">Upgrade to Pro</button>
+      </div>
+    </div>
+
+    <!-- Current Restrictions -->
+    <div class="card" id="restrictionsCard">
+      <h2 id="restrictionsTitle">Current Restrictions (2)</h2>
+      <div id="blocklistTable">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Country</th><th>Code</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>🇷🇺 Russian Federation</td><td>RU</td><td><button class="btn-plain" style="color:var(--p-color-text-critical)">Remove</button></td></tr>
+              <tr><td>🇨🇳 China</td><td>CN</td><td><button class="btn-plain" style="color:var(--p-color-text-critical)">Remove</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="exceptSummary" style="display:none;">
+        <p class="subtext">You are in <strong>block-except mode</strong>. All countries are blocked except those listed above.</p>
+        <div class="summary-chips" id="summaryChips"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+      <div class="modal-header">Block all countries except selected?</div>
+      <div class="modal-body" id="modalBody">
+        This will block visitors from every country except the selected ones.
+        This replaces your current 2 blocked countries.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="modalCancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="modalConfirm">Block except</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const COUNTRIES = [
+      { code: "US", name: "United States", flag: "🇺🇸" },
+      { code: "CA", name: "Canada", flag: "🇨🇦" },
+      { code: "GB", name: "United Kingdom", flag: "🇬🇧" },
+      { code: "AU", name: "Australia", flag: "🇦🇺" },
+      { code: "DE", name: "Germany", flag: "🇩🇪" },
+      { code: "FR", name: "France", flag: "🇫🇷" },
+      { code: "IN", name: "India", flag: "🇮🇳" },
+      { code: "BR", name: "Brazil", flag: "🇧🇷" },
+      { code: "MX", name: "Mexico", flag: "🇲🇽" },
+      { code: "JP", name: "Japan", flag: "🇯🇵" },
+      { code: "RU", name: "Russian Federation", flag: "🇷🇺" },
+      { code: "CN", name: "China", flag: "🇨🇳" },
+      { code: "NL", name: "Netherlands", flag: "🇳🇱" },
+      { code: "IT", name: "Italy", flag: "🇮🇹" },
+      { code: "ES", name: "Spain", flag: "🇪🇸" },
+      { code: "SE", name: "Sweden", flag: "🇸🇪" },
+      { code: "NO", name: "Norway", flag: "🇳🇴" },
+      { code: "PL", name: "Poland", flag: "🇵🇱" },
+      { code: "SG", name: "Singapore", flag: "🇸🇬" },
+      { code: "NZ", name: "New Zealand", flag: "🇳🇿" },
+    ].sort((a, b) => a.name.localeCompare(b.name));
+
+    let selected = [];
+    let exceptModeActive = false;
+    let plan = "pro";
+
+    const els = {
+      planSelect: document.getElementById("planSelect"),
+      presetSelect: document.getElementById("presetSelect"),
+      exceptCard: document.getElementById("exceptCard"),
+      exceptControls: document.getElementById("exceptControls"),
+      upgradePrompt: document.getElementById("upgradePrompt"),
+      chipsContainer: document.getElementById("chipsContainer"),
+      countrySearch: document.getElementById("countrySearch"),
+      dropdown: document.getElementById("dropdown"),
+      blockExceptBtn: document.getElementById("blockExceptBtn"),
+      confirmModal: document.getElementById("confirmModal"),
+      modalBody: document.getElementById("modalBody"),
+      modalCancel: document.getElementById("modalCancel"),
+      modalConfirm: document.getElementById("modalConfirm"),
+      activeBanner: document.getElementById("activeBanner"),
+      activeBannerChips: document.getElementById("activeBannerChips"),
+      blocklistTable: document.getElementById("blocklistTable"),
+      exceptSummary: document.getElementById("exceptSummary"),
+      summaryChips: document.getElementById("summaryChips"),
+      restrictionsTitle: document.getElementById("restrictionsTitle"),
+      mapLabel: document.getElementById("mapLabel"),
+      mapLegend: document.getElementById("mapLegend"),
+      editBtn: document.getElementById("editBtn"),
+      switchBtn: document.getElementById("switchBtn"),
+    };
+
+    function renderChips(container) {
+      container.innerHTML = selected.map((c) => `
+        <span class="chip" data-code="${c.code}">
+          <span>${c.flag}</span>
+          <span>${c.name}</span>
+          <button type="button" aria-label="Remove ${c.name}" data-remove="${c.code}">×</button>
+        </span>
+      `).join("");
+    }
+
+    function chipHtml(c) {
+      return `<span class="chip"><span>${c.flag}</span><span>${c.name}</span></span>`;
+    }
+
+    function updateUI() {
+      const isFree = plan === "free";
+      els.exceptCard.classList.toggle("locked", isFree);
+      els.exceptControls.style.display = isFree ? "none" : (exceptModeActive ? "none" : "block");
+      els.upgradePrompt.style.display = isFree ? "flex" : "none";
+      els.activeBanner.style.display = exceptModeActive && !isFree ? "block" : "none";
+      els.blocklistTable.style.display = exceptModeActive ? "none" : "block";
+      els.exceptSummary.style.display = exceptModeActive ? "block" : "none";
+      els.exceptCard.classList.toggle("active", exceptModeActive);
+
+      renderChips(els.chipsContainer);
+      const chipsHtml = selected.map(chipHtml).join("");
+      els.activeBannerChips.innerHTML = chipsHtml;
+      els.summaryChips.innerHTML = chipsHtml;
+
+      els.blockExceptBtn.disabled = selected.length === 0 || isFree;
+      els.restrictionsTitle.textContent = exceptModeActive
+        ? "Blocking Policy (except mode)"
+        : "Current Restrictions (2)";
+
+      if (exceptModeActive) {
+        els.mapLabel.textContent = "Except mode — green = allowed, red = all others blocked";
+        els.mapLegend.innerHTML = `
+          <span><span class="legend-dot green"></span> Allowed</span>
+          <span><span class="legend-dot red"></span> Blocked</span>
+        `;
+      } else {
+        els.mapLabel.textContent = "Blocklist mode — red countries are blocked";
+        els.mapLegend.innerHTML = `<span><span class="legend-dot red"></span> Blocked</span>`;
+      }
+    }
+
+    function filterCountries(q) {
+      const lower = q.toLowerCase();
+      const codes = new Set(selected.map((c) => c.code));
+      return COUNTRIES.filter(
+        (c) => !codes.has(c.code) && (c.name.toLowerCase().includes(lower) || c.code.toLowerCase().includes(lower))
+      ).slice(0, 8);
+    }
+
+    function showDropdown(items) {
+      if (items.length === 0) {
+        els.dropdown.classList.remove("open");
+        return;
+      }
+      els.dropdown.innerHTML = items.map((c) => `
+        <button type="button" class="dropdown-item" data-code="${c.code}">
+          <span>${c.flag}</span><span>${c.name}</span>
+        </button>
+      `).join("");
+      els.dropdown.classList.add("open");
+    }
+
+    els.countrySearch.addEventListener("input", () => {
+      showDropdown(filterCountries(els.countrySearch.value));
+    });
+
+    els.countrySearch.addEventListener("focus", () => {
+      showDropdown(filterCountries(els.countrySearch.value));
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!document.getElementById("chipInputWrap").contains(e.target)) {
+        els.dropdown.classList.remove("open");
+      }
+    });
+
+    els.dropdown.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-code]");
+      if (!btn) return;
+      const c = COUNTRIES.find((x) => x.code === btn.dataset.code);
+      if (c) {
+        selected.push(c);
+        els.countrySearch.value = "";
+        els.dropdown.classList.remove("open");
+        updateUI();
+      }
+    });
+
+    els.chipsContainer.addEventListener("click", (e) => {
+      const code = e.target.dataset.remove;
+      if (!code) return;
+      selected = selected.filter((c) => c.code !== code);
+      updateUI();
+    });
+
+    els.blockExceptBtn.addEventListener("click", () => {
+      const names = selected.map((c) => c.name).join(", ");
+      els.modalBody.textContent = `This will block visitors from every country except ${names}. This replaces your current 2 blocked countries.`;
+      els.confirmModal.classList.add("open");
+    });
+
+    els.modalCancel.addEventListener("click", () => els.confirmModal.classList.remove("open"));
+    els.modalConfirm.addEventListener("click", () => {
+      exceptModeActive = true;
+      els.confirmModal.classList.remove("open");
+      updateUI();
+    });
+
+    els.editBtn.addEventListener("click", () => {
+      exceptModeActive = false;
+      updateUI();
+      els.countrySearch.focus();
+    });
+
+    els.switchBtn.addEventListener("click", () => {
+      exceptModeActive = false;
+      selected = [];
+      updateUI();
+    });
+
+    els.planSelect.addEventListener("change", () => {
+      plan = els.planSelect.value;
+      if (plan === "free") exceptModeActive = false;
+      updateUI();
+    });
+
+    els.presetSelect.addEventListener("change", () => {
+      const v = els.presetSelect.value;
+      exceptModeActive = v === "active";
+      if (v === "empty") selected = [];
+      else if (v === "us") selected = [COUNTRIES.find((c) => c.code === "US")];
+      else if (v === "us-ca") selected = ["US", "CA"].map((code) => COUNTRIES.find((c) => c.code === code));
+      else if (v === "active") selected = ["US", "CA"].map((code) => COUNTRIES.find((c) => c.code === code));
+      updateUI();
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>
